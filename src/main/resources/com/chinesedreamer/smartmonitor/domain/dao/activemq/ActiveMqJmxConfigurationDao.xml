@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chinesedreamer.smartmonitor.domain.dao.activemq.ActiveMqJmxConfigurationDao">
+	
+	<sql id="jmxConfigColumns">
+		ID,HOST_IP,PORT,APP_NAME,JMX_DOMAIN,BROKER_NAME
+	</sql>
+	<resultMap id="jmxConfigMap" type="com.chinesedreamer.smartmonitor.domain.model.activemq.ActiveMqJmxConfiguration">
+		<id column="id" property="id" jdbcType="VARCHAR"/>
+		<result column="HOST_IP" property="hostIp" jdbcType="VARCHAR" />
+        <result column="PORT" property="port" jdbcType="VARCHAR" />
+        <result column="APP_NAME" property="appName" jdbcType="VARCHAR" />
+        <result column="JMX_DOMAIN" property="jmxDomain" jdbcType="VARCHAR" />
+        <result column="BROKER_NAME" property="brokerName" jdbcType="VARCHAR" />
+    </resultMap>
+    
+    <select id="findAll" resultMap="jmxConfigMap"
+    	parameterType="com.chinesedreamer.smartmonitor.domain.query.activemq.ActiveMqJmxConfigurationQuery">
+    	SELECT 
+    		<include refid="jmxConfigColumns"/>
+    	FROM M_ACTIVEMQ_CONFIG_JMX
+    	<where>
+    		<if test="null != status">
+    			AND STATUS = #{status,jdbcType=INTEGER,typeHandler=com.chinesedreamer.smartmonitor.domain.constant.activemq.ActiveMqConfigStatusTypeHandler}
+    		</if>
+    	</where>
+    </select>
+
+</mapper>
+
+

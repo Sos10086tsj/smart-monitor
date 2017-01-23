@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chinesedreamer.smartmonitor.domain.dao.activemq.BrokerInfoDao">
+	
+	<sql id="brokerInfoColumns">
+		ID,CONFIG_ID,BROKER_ID,BROKER_NAME,BROKER_VERSION,UPTIME,
+		TOTAL_ENQUEUE,TOTAL_DEQUEUE,TOTAL_PRODUCER,TOTAL_CONSUMER,
+		TOTAL_MESSAGE,MEMORY_LIMIT,MEMORY_PERCENT_USAGE,STORE_LIMIT,
+		STORE_PERCENT_USAGE,TEMP_LIMIT,TEMP_PERCENT_USAGE,LOG_DATE
+	</sql>
+	<resultMap id="brokerInfoMap" type="com.chinesedreamer.smartmonitor.domain.model.activemq.BrokerInfo">
+		<id column="id" property="id" jdbcType="VARCHAR"/>
+		<result column="CONFIG_ID" property="configId" jdbcType="VARCHAR" />
+        <result column="BROKER_ID" property="brokerId" jdbcType="VARCHAR" />
+        <result column="BROKER_NAME" property="brokerName" jdbcType="VARCHAR" />
+        <result column="BROKER_VERSION" property="brokerVersion" jdbcType="VARCHAR" />
+        <result column="UPTIME" property="uptime" jdbcType="DECIMAL" />
+        <result column="TOTAL_ENQUEUE" property="totalEnqueue" jdbcType="DECIMAL" />
+        <result column="TOTAL_DEQUEUE" property="totalDequeue" jdbcType="DECIMAL" />
+        <result column="TOTAL_PRODUCER" property="totalProducer" jdbcType="DECIMAL" />
+        <result column="TOTAL_CONSUMER" property="totalConsumer" jdbcType="DECIMAL" />
+        <result column="TOTAL_MESSAGE" property="totalMessage" jdbcType="DECIMAL" />
+        <result column="MEMORY_LIMIT" property="memoryLimit" jdbcType="DECIMAL" />
+        <result column="MEMORY_PERCENT_USAGE" property="memoryPercentUsage" jdbcType="DECIMAL" />
+        <result column="STORE_LIMIT" property="storeLimit" jdbcType="DECIMAL" />
+        <result column="STORE_PERCENT_USAGE" property="storePercentUsage" jdbcType="DECIMAL" />
+        <result column="TEMP_LIMIT" property="tempLimit" jdbcType="DECIMAL" />
+        <result column="TEMP_PERCENT_USAGE" property="tempPercentUsage" jdbcType="DECIMAL" />
+        <result column="LOG_DATE" property="logDate" jdbcType="TIMESTAMP" />
+    </resultMap>
+    
+    <insert id="save" parameterType="com.chinesedreamer.smartmonitor.domain.model.activemq.BrokerInfo">
+    	INSERT INTO M_ACTIVEMQ_BROKER
+    	(
+    		<include refid="brokerInfoColumns"/>
+    	)VALUES (
+    		#{id,jdbcType=VARCHAR},
+    		#{configId,jdbcType=VARCHAR},
+    		#{brokerId,jdbcType=VARCHAR},
+    		#{brokerName,jdbcType=VARCHAR},
+    		#{brokerVersion,jdbcType=VARCHAR},
+    		#{uptime,jdbcType=DECIMAL},
+    		#{totalEnqueue,jdbcType=DECIMAL},
+    		#{totalDequeue,jdbcType=DECIMAL},
+    		#{totalProducer,jdbcType=DECIMAL},
+    		#{totalConsumer,jdbcType=DECIMAL},
+    		#{totalMessage,jdbcType=DECIMAL},
+    		#{memoryLimit,jdbcType=DECIMAL},
+    		#{memoryPercentUsage,jdbcType=DECIMAL},
+    		#{storeLimit,jdbcType=DECIMAL},
+    		#{storePercentUsage,jdbcType=DECIMAL},
+    		#{tempLimit,jdbcType=DECIMAL},
+    		#{tempPercentUsage,jdbcType=DECIMAL},
+    		#{logDate,jdbcType=TIMESTAMP}
+    	)
+    </insert>
+    
+    <select id="findById" resultMap="brokerInfoMap">
+    	SELECT *
+    	FROM M_ACTIVEMQ_BROKER
+    	<where>
+    		AND ID = #{id,jdbcType=VARCHAR}
+    	</where>
+    </select>
+
+</mapper>
+
+

@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chinesedreamer.smartmonitor.domain.dao.quartz.QuartzJobDao">
+	
+	<sql id="quartzJobColumns">
+		ID,GROUP_CODE,NAME,BEAN_NAME,EXECUTE_METHOD,CRON_EXPRESSION,NEED_REFRESH,CONCURRENT,START_TIME,END_TIME,START_NOW
+	</sql>
+	<resultMap id="quartzJobMap" type="com.chinesedreamer.smartmonitor.domain.model.quartz.QuartzJob">
+		<id column="id" property="id" jdbcType="VARCHAR"/>
+		<result column="GROUP_CODE" property="groupCode" jdbcType="VARCHAR" />
+        <result column="NAME" property="name" jdbcType="VARCHAR" />
+        <result column="BEAN_NAME" property="beanName" jdbcType="VARCHAR" />
+        <result column="EXECUTE_METHOD" property="executeMethod" jdbcType="VARCHAR" />
+        <result column="CRON_EXPRESSION" property="cronExpression" jdbcType="VARCHAR" />
+        <result column="NEED_REFRESH" property="needRefresh" jdbcType="BOOLEAN" />
+        <result column="CONCURRENT" property="concurrent" jdbcType="BOOLEAN" />
+        <result column="START_TIME" property="startTime" jdbcType="TIMESTAMP" />
+        <result column="END_TIME" property="endTime" jdbcType="TIMESTAMP" />
+        <result column="START_NOW" property="startNow" jdbcType="BOOLEAN" />
+    </resultMap>
+    
+    <select id="findAll" resultMap="quartzJobMap"
+    	parameterType="com.chinesedreamer.smartmonitor.domain.query.quartz.QuartzJobQuery">
+    	SELECT 
+    		<include refid="quartzJobColumns"/>
+    	FROM
+    		S_QUARTZ_JOB
+    	<where>
+    		<if test="null != needRefresh">
+    			AND NEED_REFRESH = #{needRefresh,jdbcType=BOOLEAN}
+    		</if>
+    	</where>
+    </select>
+    
+    <update id="update" parameterType="com.chinesedreamer.smartmonitor.domain.model.quartz.QuartzJob">
+    	UPDATE S_QUARTZ_JOB
+    	<set>
+    		GROUP_CODE = #{groupCode,jdbcType=VARCHAR},
+    		NAME = #{name,jdbcType=VARCHAR},
+    		BEAN_NAME = #{beanName,jdbcType=VARCHAR},
+    		EXECUTE_METHOD = #{executeMethod,jdbcType=VARCHAR},
+    		CRON_EXPRESSION = #{cronExpression,jdbcType=VARCHAR},
+    		NEED_REFRESH = #{needRefresh,jdbcType=BOOLEAN},
+    		CONCURRENT = #{concurrent,jdbcType=BOOLEAN},
+    		START_TIME = #{startTime,jdbcType=TIMESTAMP},
+    		END_TIME = #{endTime,jdbcType=TIMESTAMP},
+    		START_NOW = #{startNow,jdbcType=BOOLEAN}
+    	</set>
+    </update>
+
+</mapper>
+
+

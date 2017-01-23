@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chinesedreamer.smartmonitor.domain.dao.activemq.BrokerQueueInfoDao">
+	
+	<sql id="brokerQueueInfoColumns">
+		ID,BROKER_INFO_ID,QUEUE_NAME,PENDING_MESSAGE_NUM,CONSUMER_NUM,MESSAGEE_NQUEUED_NUM,MESSAGE_DEQUEUED_NUM
+	</sql>
+	<resultMap id="brokerQueueInfoMap" type="com.chinesedreamer.smartmonitor.domain.model.activemq.BrokerQueueInfo">
+		<id column="id" property="id" jdbcType="VARCHAR"/>
+		<result column="BROKER_INFO_ID" property="brokerInfoId" jdbcType="VARCHAR" />
+        <result column="QUEUE_NAME" property="queueName" jdbcType="VARCHAR" />
+        <result column="PENDING_MESSAGE_NUM" property="pendingMessageNum" jdbcType="DECIMAL" />
+        <result column="CONSUMER_NUM" property="consumerNum" jdbcType="DECIMAL" />
+        <result column="MESSAGEE_NQUEUED_NUM" property="messageEnqueuedNum" jdbcType="DECIMAL" />
+        <result column="MESSAGE_DEQUEUED_NUM" property="messageDequeuedNum" jdbcType="DECIMAL" />
+    </resultMap>
+    
+    <insert id="saveInBatch" parameterType="com.chinesedreamer.smartmonitor.domain.model.activemq.BrokerQueueInfo">
+    	INSERT INTO M_ACTIVEMQ_BROKER_QUEUE
+    	(
+    		<include refid="brokerQueueInfoColumns"/>
+    	)(
+    	<foreach collection="list" item="item" index="index" separator="union all" >
+    		SELECT 
+    			#{item.id,jdbcType=VARCHAR},
+    			#{item.brokerInfoId,jdbcType=VARCHAR},
+    			#{item.queueName,jdbcType=VARCHAR},
+    			#{item.pendingMessageNum,jdbcType=DECIMAL},
+    			#{item.consumerNum,jdbcType=DECIMAL},
+    			#{item.messageEnqueuedNum,jdbcType=DECIMAL},
+    			#{item.messageDequeuedNum,jdbcType=DECIMAL}
+    		FROM DUAL
+    	</foreach>
+    	)
+    </insert>
+    
+    <select id="getLatestList" resultMap="brokerQueueInfoMap">
+    	SELECT ABQ.*
+    	FROM 
+    	M_ACTIVEMQ_BROKER_QUEUE ABQ,
+    	M_ACTIVEMQ_BROKER AB
+    	<where>
+    		AND AB.ID = ABQ.BROKER_INFO_ID
+    		AND ABQ.BROKER_INFO_ID = #{infoId,jdbcType=VARCHAR}
+    		AND ABQ.QUEUE_NAME = #{queueName,jdbcType=VARCHAR}
+    	</where>
+    	ORDER BY AB.LOG_DATE DESC
+    </select>
+
+</mapper>
+
+
