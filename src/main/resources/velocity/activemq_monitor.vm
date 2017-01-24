@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>MQ监控报表</title>
+<style>
+.grid-container {
+	width: 100%;
+	max-width: 1200px;
+}
+.row:before, .row:after {
+	content: "";
+	display: table;
+	clear: both;
+}
+[class*='col-'] {
+	float: left;
+	min-height: 1px;
+	width: 16.66%;
+}
+.col-1 {
+	width: 16.66%;
+}
+.col-2 {
+	width: 33.33%;
+}
+.col-3 {
+	width: 50%;
+}
+.col-4 {
+	width: 66.66%;
+}
+.col-5 {
+	width: 83.33%;
+}
+.col-6 {
+	width: 100%;
+}
+@media all and (max-width:800px) {
+	.col-1 {
+		width: 33.33%;
+	}
+	.col-2 {
+		width: 50%;
+	}
+	.col-3 {
+		width: 83.33%;
+	}
+	.col-4 {
+		width: 100%;
+	}
+	.col-5 {
+		width: 100%;
+	}
+	.col-6 {
+		width: 100%;
+	}
+	.row .col-2:last-of-type {
+		width: 100%;
+	}
+	.row .col-5 ~ .col-1 {
+		width: 100%;
+	}
+}
+@media all and (max-width:650px) {
+	.col-1 {
+		width: 50%;
+	}
+	.col-2 {
+		width: 100%;
+	}
+	.col-3 {
+		width: 100%;
+	}
+	.col-4 {
+		width: 100%;
+	}
+	.col-5 {
+		width: 100%;
+	}
+	.col-6 {
+		width: 100%;
+	}
+}
+.mq-table {
+	border-collapse: separate;
+	border-spacing: 0;
+	width: 80%;
+	margin : 0 auto;
+}
+table {
+	background-color: transparent;
+	empty-cells: show;
+	max-width: 100%;
+}
+.mq-table-striped>tbody>tr:nth-child(2n+1)>td, .mq-table-striped>tbody>tr:nth-child(2n+1)>th
+	{
+	background-color: #f9f9f9;
+}
+.main {
+	border: 1px solid #000000;
+	width: 80%;
+	margin: 0 auto;
+	text-align: center;
+}
+
+.main .dashed_line {
+	border-bottom: 1px dashed #ccc;
+	margin: 0 auto;
+	width: 90%;
+}
+
+.main .solid_line {
+	border-bottom: 1px solid #ccc;
+	margin: 0 auto;
+	width: 90%;
+}
+.main .subject {
+	padding: 20px 0 20px 0;
+	font-family: Helvetica, 'Hiragino Sans GB', 'Microsoft Yahei', '微软雅黑',
+		Arial, sans-serif;
+	font-size: 1.5em;
+	font-weight: bold;
+}
+.main .subject span {
+	color: red;
+}
+.main .content {
+	margin-top: 20px;
+	margin-bottom: 20px;
+}
+.main .content .group .broker_info {
+	line-height: 35px;
+}
+.main .content .group .broker_info .label_title {
+	font-weight: 500;
+	text-align: right;
+}
+.main .content .group .broker_info .text_content {
+	font-style: italic;
+	font-weight: 100;
+}
+.main .content .group .broker_info span{
+	color : red;
+	font-weight: 600;
+}
+.main .queue_info {
+	margin-top: 20px;
+	line-height: 32px;
+}
+</style>
+</head>
+<body>
+	<div class="main">
+	<div class="subject">
+		Active MQ Monitory Report(<span>${data.reportDate}</span>)
+	</div>
+	<div class="content">
+		<div class="solid_line"></div>
+		#foreach($item in $data.brokerInfos)
+			<div class="group">
+				<div class="broker_info grid-container">
+					<div class="row">
+						<div class="col-1 label_title">Broker#</div>
+						<div class="col-2 text_content">${item.brokerId}</div>
+						<div class="col-1 label_title">Broker Name</div>
+						<div class="col-2 text_content">${item.brokerName}</div>
+					</div>
+					<div class="row">
+						<div class="col-1 label_title">Version</div>
+						<div class="col-2 text_content">${item.brokerVersion}</div>
+						<div class="col-1 label_title">运行时间</div>
+						<div class="col-2 text_content">${item.uptime}</div>
+					</div>
+					<div class="row">
+						<div class="col-1 label_title">出队/入队</div>
+						<div class="col-2 text_content">${item.dequeueNum}/${item.enqueueNum}(
+																								#if($item.reamining >=  100) 
+																									<span>${item.reamining}</span> 
+																								#else 
+																									${item.reamining} 
+																								#end
+																							)</div>
+						<div class="col-1 label_title">内存</div>
+						<div class="col-2 text_content">${item.memory}M(
+																		#if($item.memoryUsagePercent >=  85)
+																			<span>${item.memoryUsagePercent}</span>
+																	 	#else 
+																			${item.memoryUsagePercent} 
+																		#end
+																	%)</div>
+					</div>
+					<div class="row">
+						<div class="col-1 label_title">硬盘</div>
+						<div class="col-2 text_content">${item.hardDisk}G(
+																		#if($item.hardDiskUsagePercent >=  85)
+																			<span>${item.hardDiskUsagePercent}</span>
+																	 	#else 
+																			${item.hardDiskUsagePercent} 
+																		#end
+																	%)</div>
+						<div class="col-1 label_title">临时内存</div>
+						<div class="col-2 text_content">${item.tempCache}M(
+																		#if($item.tempCacheUsagePercent >=  85)
+																			<span>${item.tempCacheUsagePercent}</span>
+																	 	#else 
+																			${item.tempCacheUsagePercent} 
+																		#end
+																	%)</div>
+					</div>
+				</div>
+				<div class="dashed_line"></div>
+				<div class="queue_info">
+					<div class="queue_item">
+						<table class="mq-table mq-table-striped">
+							<thead>
+								<tr>
+									<th>Queue</th>
+									<th>等待处理消息数</th>
+									<th>出队/入队</th>
+									<th>预计</th>
+								</tr>
+							</thead>
+							<tbody>
+								#foreach($queueItem in $item.queueInfos)
+									<tr>
+										<td>${queueItem.queueName}</td>
+										<td>
+											#if($queueItem.reamining >=  50)
+												<span>${queueItem.reamining}</span>
+											#else
+												${queueItem.reamining}
+											#end
+										</td>
+										<td>${queueItem.dequeueNum}/${queueItem.enqueueNum}</td>
+										<td>${queueItem.strategy}</td>
+									</tr>
+								#end
+							</tbody>
+						</table>
+					</div>
+				</div>
+
+			</div>
+			<div class="solid_line"></div>
+		#end
+		</div>
+	</div>
+</body>
+</html>

@@ -1,0 +1,12 @@
+{
+    "config": {
+        "mail": [
+            {
+                "from": "paris1989@163.com",
+                "host": "smtp.163.com",
+                "password": "013566039620",
+                "username": "paris1989@163.com"
+            }
+        ]
+    }
+}
