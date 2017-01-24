@@ -31,4 +31,17 @@ public class MathUtil {
 		total = total - min - max;
 		return total / (nums.size() - 2);
 	}
+	
+	public static int getMbyte(Long byteSize) {
+		Long kb = byteSize / 1024;
+		Long mb = kb / 1024;
+		return mb.intValue();
+	}
+	
+	public static int getGbyte(Long byteSize) {
+		Long kb = byteSize / 1024;
+		Long mb = kb / 1024;
+		Long gb = mb /1024;
+		return gb.intValue();
+	}
 }

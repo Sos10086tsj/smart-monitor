@@ -1,5 +1,10 @@
 package com.chinesedreamer.smartmonitor.util;
 
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.text.NumberFormat;
+import java.util.Locale;
+
 import org.apache.commons.lang3.StringUtils;
 
 /**
@@ -8,6 +13,40 @@ import org.apache.commons.lang3.StringUtils;
  * Date:Jan 20, 2017
 **/
 public class ActiveMqUtil {
+	
+	public static String getUptimeStr(long uptime) {
+		NumberFormat fmtI = new DecimalFormat("###,###", new DecimalFormatSymbols(Locale.ENGLISH));
+        NumberFormat fmtD = new DecimalFormat("###,##0.000", new DecimalFormatSymbols(Locale.ENGLISH));
+
+        if (uptime < 60) {
+            return fmtD.format(uptime) + " seconds";
+        }
+        uptime /= 60;
+        if (uptime < 60) {
+            long minutes = (long) uptime;
+            String s = fmtI.format(minutes) + (minutes > 1 ? " minutes" : " minute");
+            return s;
+        }
+        uptime /= 60;
+        if (uptime < 24) {
+            long hours = (long) uptime;
+            long minutes = (long) ((uptime - hours) * 60);
+            String s = fmtI.format(hours) + (hours > 1 ? " hours" : " hour");
+            if (minutes != 0) {
+                s += " " + fmtI.format(minutes) + (minutes > 1 ? " minutes" : " minute");
+            }
+            return s;
+        }
+        uptime /= 24;
+        long days = (long) uptime;
+        long hours = (long) ((uptime - days) * 24);
+        String s = fmtI.format(days) + (days > 1 ? " days" : " day");
+        if (hours != 0) {
+            s += " " + fmtI.format(hours) + (hours > 1 ? " hours" : " hour");
+        }
+        return s;
+	}
+	
 	public static long getUptime(String uptime){
 		long time = 0l;
 		if (StringUtils.isEmpty(uptime) || uptime.equals("not started")) {

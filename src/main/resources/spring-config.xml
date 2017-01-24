@@ -35,9 +35,26 @@
 	<task:scheduler id="defaultScheduler" pool-size="10"/>
 	<task:annotation-driven executor="defaultExecutor" scheduler="defaultScheduler"/>
 	
+	<!-- mail thread -->
+	<bean id="threadPoolTaskExecutor"
+		class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">
+		<!-- 核心线程数 -->
+		<property name="corePoolSize" value="4" />
+		<!-- 最大线程数 -->
+		<property name="maxPoolSize" value="8" />
+		<!-- 队列最大长度 >=mainExecutor.maxSize -->
+		<property name="queueCapacity" value="100" />
+		<!-- 线程池维护线程所允许的空闲时间 -->
+		<property name="keepAliveSeconds" value="300" />
+		<!-- 线程池对拒绝任务(无线程可用)的处理策略 -->
+		<property name="rejectedExecutionHandler">
+			<bean class="java.util.concurrent.ThreadPoolExecutor$CallerRunsPolicy" />
+		</property>
+	</bean>
+	
 <!-- 	<aop:aspectj-autoproxy /> -->
 	
-	<!-- velocity 
+	<!-- velocity -->
 	<bean id="velocityEngine" class="org.springframework.ui.velocity.VelocityEngineFactoryBean">
         <property name="velocityProperties">
             <props>
@@ -47,7 +64,7 @@
         		<prop key="class.resource.loader.class">org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader</prop>
         	</props>
         </property>
-    </bean>-->
+    </bean>
     
     <import resource="datasource-config.xml"/>
 	<import resource="quartz-config.xml"/>

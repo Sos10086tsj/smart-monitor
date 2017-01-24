@@ -41,7 +41,7 @@
     	M_ACTIVEMQ_BROKER AB
     	<where>
     		AND AB.ID = ABQ.BROKER_INFO_ID
-    		AND ABQ.BROKER_INFO_ID = #{infoId,jdbcType=VARCHAR}
+    		AND AB.CONFIG_ID = #{configId,jdbcType=VARCHAR}
     		AND ABQ.QUEUE_NAME = #{queueName,jdbcType=VARCHAR}
     	</where>
     	ORDER BY AB.LOG_DATE DESC

@@ -25,5 +25,5 @@ public interface BrokerQueueInfoDao {
 	 * @param queueName
 	 * @return
 	 */
-	public List<BrokerQueueInfo> getLatestList(@Param(value="infoId")String infoId,@Param(value="queueName")String queueName);
+	public List<BrokerQueueInfo> getLatestList(@Param(value="configId")String configId,@Param(value="queueName")String queueName);
 }

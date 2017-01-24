@@ -8,19 +8,20 @@ import com.chinesedreamer.smartmonitor.domain.query.BaseQuery;
  * Date:Jan 23, 2017
 **/
 public class BrokerQueueInfoQuery extends BaseQuery{
-	private String infoId;
+	private String configId;
 	private String queueName;
-	public String getInfoId() {
-		return infoId;
+	public String getConfigId() {
+		return configId;
 	}
 	public String getQueueName() {
 		return queueName;
 	}
-	public void setInfoId(String infoId) {
-		this.infoId = infoId;
+	public void setConfigId(String configId) {
+		this.configId = configId;
 	}
 	public void setQueueName(String queueName) {
 		this.queueName = queueName;
 	}
+	
 	
 }

@@ -13,6 +13,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 import com.chinesedreamer.smartmonitor.domain.model.quartz.QuartzJob;
 import com.chinesedreamer.smartmonitor.domain.query.quartz.QuartzJobQuery;
 import com.chinesedreamer.smartmonitor.quartz.service.QuartzService;
+import com.chinesedreamer.smartmonitor.util.MailUtil;
 
 /**
  * Description:
@@ -25,6 +26,7 @@ public class InitializationListener implements ServletContextListener{
 	@Override
 	public void contextInitialized(ServletContextEvent sce) {
 		this.logger.info(" Initialization start...");
+		MailUtil.initMailConfigLoading();
 		this.initQuartz(sce);
 		this.logger.info(" Initialization Finished.");
 	}

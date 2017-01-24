@@ -174,7 +174,7 @@ public class ActiveMqServiceJmxImpl implements ActiveMqService{
 	@Override
 	public List<BrokerQueueInfo> getLastQueueInfos(BrokerQueueInfoQuery queueInfoQuery) {
 		PageHelper.startPage(queueInfoQuery.getPageNum(), queueInfoQuery.getPageSize());
-		return this.brokerQueueInfoDao.getLatestList(queueInfoQuery.getInfoId(),queueInfoQuery.getQueueName());
+		return this.brokerQueueInfoDao.getLatestList(queueInfoQuery.getConfigId(),queueInfoQuery.getQueueName());
 	}
 
 	@Override
