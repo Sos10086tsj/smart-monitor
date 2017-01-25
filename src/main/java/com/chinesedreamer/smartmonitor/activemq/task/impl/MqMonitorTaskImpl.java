@@ -89,8 +89,11 @@ public class MqMonitorTaskImpl implements MqMonitorTask{
 					if (!dbQueueInfos.isEmpty()) {
 						BrokerQueueInfo first = dbQueueInfos.get(0);
 						int enququeInterval = queueInfo.getMessageEnqueuedNum().intValue() - first.getMessageEnqueuedNum().intValue();
-						long timeInteval = System.currentTimeMillis() - (this.mqService.findById(first.getBrokerInfoId()).getLogDate().getTime());
-						int enqueuePerMinute = enququeInterval / ((int)timeInteval / 1000 / 60);
+						int timeInteval = (int)(System.currentTimeMillis() - (this.mqService.findById(first.getBrokerInfoId()).getLogDate().getTime()));
+						if (timeInteval == 0) {
+							timeInteval = 1;
+						}
+						int enqueuePerMinute = enququeInterval / (timeInteval / 1000 / 60);
 						if (enqueuePerMinute <= 0) {
 							cost = "<span>" + enqueuePerMinute + "未收到消息</span>";
 						}else {
