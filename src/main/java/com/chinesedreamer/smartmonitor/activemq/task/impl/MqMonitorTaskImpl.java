@@ -85,6 +85,19 @@ public class MqMonitorTaskImpl implements MqMonitorTask{
 					queueInfoQuery.setConfigId(jmxConfiguration.getId());
 					queueInfoQuery.setQueueName(queueInfo.getQueueName());
 					List<BrokerQueueInfo> dbQueueInfos = this.mqService.getLastQueueInfos(queueInfoQuery);
+					
+					if (!dbQueueInfos.isEmpty()) {
+						BrokerQueueInfo first = dbQueueInfos.get(0);
+						int enququeInterval = queueInfo.getMessageEnqueuedNum().intValue() - first.getMessageEnqueuedNum().intValue();
+						long timeInteval = System.currentTimeMillis() - (this.mqService.findById(first.getBrokerInfoId()).getLogDate().getTime());
+						int enqueuePerMinute = enququeInterval / ((int)timeInteval / 1000 / 60);
+						if (enqueuePerMinute <= 0) {
+							cost = "<span>" + enqueuePerMinute + "未收到消息</span>";
+						}else {
+							cost = enqueuePerMinute + "收到消息" + enqueuePerMinute + "条";
+						}
+					}
+					
 					if (dbQueueInfos.size() >= 5) {
 						List<Integer> averages = new ArrayList<Integer>();
 						int tempDequeueNo = 0;
@@ -105,12 +118,12 @@ public class MqMonitorTaskImpl implements MqMonitorTask{
 						
 						int average = MathUtil.trimmeanAverage(averages);
 						if (average == 0) {
-							cost = "历史平均值0条/分钟，请检查服务";
+							cost += "<span>历史平均值0条/分钟，请检查服务</span>";
 						}else {
-							cost = "预计需要 " + (queueInfo.getPendingMessageNum().intValue() / average) + " 分钟";
+							cost += "预计需要 " + (queueInfo.getPendingMessageNum().intValue() / average) + " 分钟";
 						}
 					}else {
-						cost = "数据太少，无法计算";
+						cost += "数据太少，无法计算";
 					}
 					referenceData.put(key, cost);
 				}
