@@ -74,10 +74,6 @@ public class MqMonitorTaskImpl implements MqMonitorTask{
 				for (BrokerQueueInfo queueInfo : brokerInfo.getQueueInfos()) {
 					String key = jmxConfiguration.getId() + queueInfo.getQueueName();
 					String cost = "";
-					if (queueInfo.getPendingMessageNum().intValue() == 0) {
-						referenceData.put(key, "-");
-						continue;
-					}
 					//获取前10次统计数据
 					BrokerQueueInfoQuery queueInfoQuery = new BrokerQueueInfoQuery();
 					queueInfoQuery.setPageNum(1);
