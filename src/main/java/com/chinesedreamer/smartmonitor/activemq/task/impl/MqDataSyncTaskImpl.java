@@ -6,7 +6,6 @@ import javax.annotation.Resource;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import com.chinesedreamer.smartmonitor.activemq.service.ActiveMqService;
@@ -22,7 +21,7 @@ import com.chinesedreamer.smartmonitor.domain.query.activemq.ActiveMqJmxConfigur
  * Auth:Paris
  * Date:Jan 22, 2017
 **/
-@Service
+@Service("mqDataSyncTask")
 public class MqDataSyncTaskImpl implements MqDataSyncTask{
 	private Logger logger = LoggerFactory.getLogger(MqDataSyncTaskImpl.class);
 
@@ -34,7 +33,6 @@ public class MqDataSyncTaskImpl implements MqDataSyncTask{
 	 * @see com.chinesedreamer.smartmonitor.activemq.task.MqDataSyncTask#updateMqData()
 	 */
 	@Override
-	@Scheduled(cron="0 0/15 * * * ?")
 	public void updateMqData() {
 		this.logger.info(" Start to update MQ broker info.");
 		ActiveMqJmxConfigurationQuery query = new ActiveMqJmxConfigurationQuery();

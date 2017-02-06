@@ -12,7 +12,6 @@ import org.apache.commons.lang3.time.DateFormatUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 
@@ -40,7 +39,7 @@ import com.chinesedreamer.smartmonitor.util.PropertiesUtil;
  * Auth:Paris
  * Date:Jan 23, 2017
 **/
-@Service
+@Service("mqMonitorTask")
 public class MqMonitorTaskImpl implements MqMonitorTask{
 	private Logger logger = LoggerFactory.getLogger(MqMonitorTaskImpl.class);
 	@Resource
@@ -51,7 +50,6 @@ public class MqMonitorTaskImpl implements MqMonitorTask{
 	private ThreadPoolTaskExecutor threadPoolTaskExecutor;
 
 	@Override
-	@Scheduled(cron="0 0/10 * * * ?")
 	public void monitor() {
 		this.logger.info(" Start to monitor MQ task.");
 		ActiveMqJmxConfigurationQuery query = new ActiveMqJmxConfigurationQuery();
@@ -82,49 +80,47 @@ public class MqMonitorTaskImpl implements MqMonitorTask{
 					queueInfoQuery.setQueueName(queueInfo.getQueueName());
 					List<BrokerQueueInfo> dbQueueInfos = this.mqService.getLastQueueInfos(queueInfoQuery);
 					
+					int enququeInterval = 0;
 					if (!dbQueueInfos.isEmpty()) {
 						BrokerQueueInfo first = dbQueueInfos.get(0);
-						int enququeInterval = queueInfo.getMessageEnqueuedNum().intValue() - first.getMessageEnqueuedNum().intValue();
+						enququeInterval = queueInfo.getMessageEnqueuedNum().intValue() - first.getMessageEnqueuedNum().intValue();
 						int timeInteval = (int)(System.currentTimeMillis() - (this.mqService.findById(first.getBrokerInfoId()).getLogDate().getTime()));
 						timeInteval = timeInteval / 1000 / 60;
-						if (timeInteval == 0) {
-							timeInteval = 1;
-						}
-						int enqueuePerMinute = enququeInterval / timeInteval;
-						if (enqueuePerMinute <= 0) {
-							cost = "<span>" + enqueuePerMinute + "未收到消息</span>";
+						cost = cost + timeInteval + "分钟收到" + enququeInterval + "条消息</br>";
+					}
+					if (enququeInterval > 0) {
+						if (dbQueueInfos.size() >= 5) {
+							List<Integer> averages = new ArrayList<Integer>();
+							int tempDequeueNo = 0;
+							BrokerInfo dbBrokerInfo = this.mqService.findById(dbQueueInfos.get(0).getBrokerInfoId());
+							int minutesInterval = 1;
+							if (null != tempRecordDate) {
+								minutesInterval = DateUtil.intervalMinutes(tempRecordDate, dbBrokerInfo.getLogDate());
+								if (minutesInterval == 0) {
+									minutesInterval = 1;
+								}
+							}
+							for (BrokerQueueInfo lastQueueInfo : dbQueueInfos) {
+								if (tempDequeueNo == 0) {
+									tempDequeueNo = lastQueueInfo.getMessageDequeuedNum().intValue();
+								}else {
+									int tempAverage = (tempDequeueNo + lastQueueInfo.getMessageDequeuedNum().intValue());
+									averages.add(tempAverage / minutesInterval);
+								}
+							}
+							tempRecordDate = dbBrokerInfo.getLogDate();
+							
+							int average = MathUtil.trimmeanAverage(averages);
+							if (average == 0) {
+								cost += "<span>历史平均值0条/分钟，请检查服务</span>";
+							}else {
+								cost += "预计需要 " + (queueInfo.getPendingMessageNum().intValue() / average) + " 分钟";
+							}
 						}else {
-							cost = enqueuePerMinute + "收到消息" + enqueuePerMinute + "条";
+							cost += "数据太少，无法计算";
 						}
 					}
 					
-					if (dbQueueInfos.size() >= 5) {
-						List<Integer> averages = new ArrayList<Integer>();
-						int tempDequeueNo = 0;
-						BrokerInfo dbBrokerInfo = this.mqService.findById(dbQueueInfos.get(0).getBrokerInfoId());
-						int minutesInterval = 1;
-						if (null != tempRecordDate) {
-							minutesInterval = DateUtil.intervalMinutes(tempRecordDate, dbBrokerInfo.getLogDate());
-						}
-						for (BrokerQueueInfo lastQueueInfo : dbQueueInfos) {
-							if (tempDequeueNo == 0) {
-								tempDequeueNo = lastQueueInfo.getMessageDequeuedNum().intValue();
-							}else {
-								int tempAverage = (tempDequeueNo + lastQueueInfo.getMessageDequeuedNum().intValue());
-								averages.add(tempAverage / minutesInterval);
-							}
-						}
-						tempRecordDate = dbBrokerInfo.getLogDate();
-						
-						int average = MathUtil.trimmeanAverage(averages);
-						if (average == 0) {
-							cost += "<span>历史平均值0条/分钟，请检查服务</span>";
-						}else {
-							cost += "预计需要 " + (queueInfo.getPendingMessageNum().intValue() / average) + " 分钟";
-						}
-					}else {
-						cost += "数据太少，无法计算";
-					}
 					referenceData.put(key, cost);
 				}
 			}
@@ -151,7 +147,7 @@ public class MqMonitorTaskImpl implements MqMonitorTask{
 			
 			brokerInfoVelocityVo.setDequeueNum(brokerInfo.getTotalDequeue().intValue());
 			brokerInfoVelocityVo.setEnqueueNum(brokerInfo.getTotalEnqueue().intValue());
-			brokerInfoVelocityVo.setReamining(brokerInfo.getTotalEnqueue().intValue() - brokerInfo.getTotalDequeue().intValue());
+			brokerInfoVelocityVo.setReamining(brokerInfo.getTotalMessage().intValue());
 			
 			brokerInfoVelocityVo.setMemory(MathUtil.getMbyte(brokerInfo.getMemoryLimit().longValue()));
 			brokerInfoVelocityVo.setMemoryUsagePercent(brokerInfo.getMemoryPercentUsage().intValue());

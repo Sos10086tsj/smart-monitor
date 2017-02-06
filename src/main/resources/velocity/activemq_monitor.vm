@@ -173,14 +173,8 @@ table {
 						<div class="col-2 text_content">${item.uptime}</div>
 					</div>
 					<div class="row">
-						<div class="col-1 label_title">出队/入队</div>
-						<div class="col-2 text_content">${item.dequeueNum}/${item.enqueueNum}(
-																								#if($item.reamining >=  100) 
-																									<span>${item.reamining}</span> 
-																								#else 
-																									${item.reamining} 
-																								#end
-																							)</div>
+						<div class="col-1 label_title">出队</div>
+						<div class="col-2 text_content">${item.dequeueNum}</div>
 						<div class="col-1 label_title">内存</div>
 						<div class="col-2 text_content">${item.memory}M(
 																		#if($item.memoryUsagePercent >=  85)
@@ -216,9 +210,9 @@ table {
 							<thead>
 								<tr>
 									<th>Queue</th>
-									<th>等待处理消息数</th>
+									<th>待处理</th>
 									<th>出队/入队</th>
-									<th>预计</th>
+									<th>策略</th>
 								</tr>
 							</thead>
 							<tbody>
