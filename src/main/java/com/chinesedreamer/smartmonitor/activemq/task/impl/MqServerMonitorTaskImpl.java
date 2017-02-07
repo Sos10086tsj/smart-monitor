@@ -121,7 +121,7 @@ public class MqServerMonitorTaskImpl implements MqServerMonitorTask{
 			info = info.substring(0, info.length() - 1);
 		}
 		String[] mapStr = info.split("=");
-		if (mapStr.length > 2) {
+		if (mapStr.length > 1) {
 			builder.append(mapStr[1]);
 		}
 	}
