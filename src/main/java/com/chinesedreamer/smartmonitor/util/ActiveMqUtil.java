@@ -186,8 +186,10 @@ public class ActiveMqUtil {
 			Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
 			Destination destination = session.createQueue(queueName);
 			MessageConsumer consumer = session.createConsumer(destination);
+			connection.start();
 			boolean hasMessage = true;
-			while (hasMessage) {
+			int messageNum = 0;
+			while (hasMessage && messageNum <= 3) {
 				Message message = consumer.receive();
 				if (null == message) {
 					hasMessage = false;
@@ -195,9 +197,11 @@ public class ActiveMqUtil {
 				}
 				Object data = extractMessage(message);
 				datas.add(data);
+				messageNum ++;
 			}
 			consumer.close();
 			session.close();
+			connection.stop();
 			connection.close();
 		} catch (Exception e) {
 			logger.error("{}",e);
