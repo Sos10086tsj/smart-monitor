@@ -1,11 +1,33 @@
 package com.chinesedreamer.smartmonitor.util;
 
+import java.io.Serializable;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
+import javax.jms.BytesMessage;
+import javax.jms.Connection;
+import javax.jms.ConnectionFactory;
+import javax.jms.Destination;
+import javax.jms.JMSException;
+import javax.jms.MapMessage;
+import javax.jms.Message;
+import javax.jms.MessageConsumer;
+import javax.jms.ObjectMessage;
+import javax.jms.Session;
+import javax.jms.TextMessage;
+
+import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.jms.support.converter.MessageConversionException;
 
 /**
  * Description:
@@ -13,6 +35,7 @@ import org.apache.commons.lang3.StringUtils;
  * Date:Jan 20, 2017
 **/
 public class ActiveMqUtil {
+	private static Logger logger = LoggerFactory.getLogger(ActiveMqUtil.class);
 	
 	public static String getUptimeStr(long uptime) {
 		NumberFormat fmtI = new DecimalFormat("###,###", new DecimalFormatSymbols(Locale.ENGLISH));
@@ -102,5 +125,83 @@ public class ActiveMqUtil {
 		}
 		
 		return time;
+	}
+	
+	public static Object extractMessage(Message message) throws JMSException, MessageConversionException {
+		if (message instanceof TextMessage) {
+			return extractStringFromMessage((TextMessage) message);
+		} else if (message instanceof BytesMessage) {
+			return extractByteArrayFromMessage((BytesMessage) message);
+		} else if (message instanceof MapMessage) {
+			return extractMapFromMessage((MapMessage) message);
+		} else if (message instanceof ObjectMessage) {
+			return extractSerializableFromMessage((ObjectMessage) message);
+		} else {
+			return message;
+		}
+	}
+	
+	public static String extractStringFromMessage(TextMessage message) throws JMSException {  
+        return message.getText();  
+    }
+	
+	public static byte[] extractByteArrayFromMessage(BytesMessage message) throws JMSException {  
+        byte[] bytes = new byte[(int) message.getBodyLength()];  
+        message.readBytes(bytes);  
+        return bytes;  
+    }  
+	
+	public static Map<String,Object> extractMapFromMessage(MapMessage message) throws JMSException {  
+        Map<String, Object> map = new HashMap<String, Object>();  
+        @SuppressWarnings("rawtypes")
+		Enumeration en = message.getMapNames();  
+        while (en.hasMoreElements()) {  
+            String key = (String) en.nextElement();  
+            map.put(key, message.getObject(key));  
+        }  
+        return map;  
+    }  
+   
+	public static Serializable extractSerializableFromMessage(ObjectMessage message) throws JMSException {  
+        return message.getObject();  
+    }
+	
+	public static List<Object> receiveAndAckMessages(String brokerUrl, String queueName) {
+		return receiveAndAckMessages("admin", "admin", brokerUrl, queueName);
+	}
+	
+	/**
+	 * 接收并ack 消息
+	 * @param username
+	 * @param password
+	 * @param brokerUrl
+	 * @param queueName
+	 * @return
+	 */
+	public static List<Object> receiveAndAckMessages(String username, String password, String brokerUrl, String queueName) {
+		List<Object> datas = new ArrayList<Object>();
+		try {
+			ConnectionFactory factory = new ActiveMQConnectionFactory(username, password, brokerUrl);
+			Connection connection = factory.createConnection();
+			Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+			Destination destination = session.createQueue(queueName);
+			MessageConsumer consumer = session.createConsumer(destination);
+			boolean hasMessage = true;
+			while (hasMessage) {
+				Message message = consumer.receive();
+				if (null == message) {
+					hasMessage = false;
+					break;
+				}
+				Object data = extractMessage(message);
+				datas.add(data);
+			}
+			consumer.close();
+			session.close();
+			connection.close();
+		} catch (Exception e) {
+			logger.error("{}",e);
+		}
+		return datas;
 	}
 }
