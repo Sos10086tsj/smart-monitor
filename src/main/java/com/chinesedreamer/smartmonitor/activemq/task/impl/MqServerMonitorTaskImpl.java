@@ -71,7 +71,11 @@ public class MqServerMonitorTaskImpl implements MqServerMonitorTask{
 				for (BrokerQueueInfo queueInfo : brokerInfo.getQueueInfos()) {
 					if (queueInfo.getQueueName().equals("monitorAccessQueue")) {
 						hasMonitorQueue = true;
-						List<Object> datas = ActiveMqUtil.receiveAndAckMessages("tcp://" + jmxConfiguration.getHostIp() + ":61616" , "monitorAccessQueue");
+						List<Object> datas = ActiveMqUtil.receiveAndAckMessages(
+								jmxConfiguration.getMqUsername(),
+								jmxConfiguration.getMqPassword(),
+								"tcp://" + jmxConfiguration.getHostIp() + ":" + jmxConfiguration.getMqPort() , 
+								"monitorAccessQueue");
 						if (datas.isEmpty()) {
 							vo.setWarning(1);
 							vo.setContent("未检测到心跳queue信息，请检查服务");

@@ -3,7 +3,7 @@
 <mapper namespace="com.chinesedreamer.smartmonitor.domain.dao.activemq.ActiveMqJmxConfigurationDao">
 	
 	<sql id="jmxConfigColumns">
-		ID,HOST_IP,PORT,APP_NAME,JMX_DOMAIN,BROKER_NAME
+		ID,HOST_IP,PORT,APP_NAME,JMX_DOMAIN,BROKER_NAME,MQ_PORT,MQ_USERNAME,MQ_PASSWORD
 	</sql>
 	<resultMap id="jmxConfigMap" type="com.chinesedreamer.smartmonitor.domain.model.activemq.ActiveMqJmxConfiguration">
 		<id column="id" property="id" jdbcType="VARCHAR"/>
@@ -12,6 +12,10 @@
         <result column="APP_NAME" property="appName" jdbcType="VARCHAR" />
         <result column="JMX_DOMAIN" property="jmxDomain" jdbcType="VARCHAR" />
         <result column="BROKER_NAME" property="brokerName" jdbcType="VARCHAR" />
+        
+        <result column="MQ_PORT" property="mqPort" jdbcType="VARCHAR" />
+        <result column="MQ_USERNAME" property="mqUsername" jdbcType="VARCHAR" />
+        <result column="MQ_PASSWORD" property="mqPassword" jdbcType="VARCHAR" />
     </resultMap>
     
     <select id="findAll" resultMap="jmxConfigMap"
