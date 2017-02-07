@@ -12,7 +12,6 @@ import org.apache.commons.lang3.time.DateFormatUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 
@@ -47,7 +46,6 @@ public class MqServerMonitorTaskImpl implements MqServerMonitorTask{
 	private ActiveMqService mqService;
 
 	@Override
-	@Scheduled(cron="0 0/1 * * * ?")
 	public void monitorAccessStatus() {
 		this.logger.info(" Start to monitor MQ Serve status task...");
 		ActiveMqJmxConfigurationQuery query = new ActiveMqJmxConfigurationQuery();
